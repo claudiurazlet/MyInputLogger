@@ -14,31 +14,44 @@ class InputLogger: public BakkesMod::Plugin::BakkesModPlugin
 	,public SettingsWindowBase // Uncomment if you wanna render your own tab in the settings menu
 	//,public PluginWindowBase // Uncomment if you want to render your own plugin window
 {
+
 	void onLoad() override;
-	void onUnload() override;
+	//void onUnload() override;
+
 	void initVars();
 	void initHooks();
-	void writeConfigFile();
+
+	bool IsEverythingOk();
+	void onTick();
+	//void writeConfigFile();
+	string doubleToString(double value, int precision);
 
 public:
 	void RenderSettings() override; // Uncomment if you wanna render your own tab in the settings menu
 	//void RenderWindow() override; // Uncomment if you want to render your own plugin window
+	void RenderCanvas(CanvasWrapper canvas);
 
-	string toggleInputLogsKey = "F9";
+	//string toggleInputLogsKey = "F9";
 
 private:
-	void onTick(string eventName);
-	void toggleInputLogging();
+
+	shared_ptr<bool> enabled;
+	string timeDifferences;
+	string lastTimeDifferences;
+	string commandList;
+
+	//void onTick(string eventName);
+	//void toggleInputLogging();
 	void registerMove();
 	bool shouldSaveCurrentMove(ControllerInput currentInputs, bool directionalAirRoll);
-	bool saving = false;
+	//bool saving = false;
 	chrono::system_clock::time_point lastToggle;
 	chrono::system_clock::time_point startingPoint;
 	optional<ControllerInput> lastInputs;
 	optional<bool> lastDirectionalAirRoll;
-	optional<string> contentBuffer;
+	string lastCommandsLog;
 	int saveKeyIndex;
 	int airRollKeyIndex;
-	string configFilePath = "cfg/inputLogger.cfg";
-	filesystem::path getConfigFilePath();
+	//string configFilePath = "cfg/inputLogger.cfg";
+	//filesystem::path getConfigFilePath();
 };
