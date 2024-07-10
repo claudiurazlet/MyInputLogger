@@ -18,8 +18,6 @@ void InputLogger::onLoad()
 {
 	_globalCvarManager = cvarManager;
 
-	//filesystem::create_directory(gameWrapper->GetDataFolder() / "inputLogs");
-
 	initVars();
 	initHooks();
 }
@@ -77,14 +75,9 @@ void InputLogger::onTick()
 
 	//if (elapsed_seconds > duration_cast<system_clock::duration>(duration<double>(1.0))) { commandList = ""; };
 
-	//LOG("Starting input logging.");
-
 	lastToggle = now;
 	startingPoint = now;
-	// Put a 1st line of heading
-	//contentBuffer = "time,throttle,jump,boost,dodgeForward,dodgeStrafe,handBrake,roll,directionalAirRoll\n";
 
-	// When saving activated get each move ingame
 	registerMove();
 }
 
@@ -95,12 +88,10 @@ void InputLogger::registerMove()
 
 	if (!shouldSaveCurrentMove(inputs, isDirectionalAirRoll)) { return; }
 
-	// Compute time since registering started
-	const auto time = to_string((system_clock::now() - startingPoint).count());
-
+	// COMPUTE TIME SINCE REGISTERING STARTED
+	//const auto time = to_string((system_clock::now() - startingPoint).count());
 
 	CarWrapper car = gameWrapper->GetLocalCar();
-	//if (car.GetInput().Jumped == 1) {
 
 	bool isDodgingForward = inputs.DodgeForward == 1;
 	bool isDodgingBackward = inputs.DodgeForward == -1;
@@ -116,36 +107,9 @@ void InputLogger::registerMove()
 	bool isAnalogueRight = inputs.Steer > 0;
 	bool isAnalogueLeft = inputs.Steer < 0;
 
-	//const auto throttle = to_string(inputs.Throttle);
-	//const auto jump = to_string(inputs.Jump);
-	//const auto boost = to_string(inputs.ActivateBoost);
-	//const auto dodgeForward = to_string(inputs.DodgeForward);
-	//const auto dodgeStrafe = doubleToString(inputs.DodgeStrafe, 2);
-	//const auto handBrake = to_string(inputs.Handbrake);
 	const auto roll = doubleToString(inputs.Roll, 1);
-	//const auto airRoll = to_string(isDirectionalAirRoll);
 	const auto analogueVertical = doubleToString(inputs.Pitch, 1);
 	const auto analogueHorizontal = doubleToString(inputs.Steer, 1);
-	//const auto yaw = doubleToString(inputs.Yaw, 2);
-
-	//const string line = time + "," + throttle + "," + jump + "," + boost + "," + dodgeForward + "," + dodgeStrafe + "," + handBrake + "," + roll + "," + to_string(directionalAirRoll) + "\n";
-
-	//contentBuffer = contentBuffer + line;
-	//lastCommandsLog = "";
-	//contentBuffer += "time: " + time + ", ";
-	//contentBuffer += "throttle: " + throttle + ", ";
-	//contentBuffer += "jump: " + jump + ", ";
-	//contentBuffer += "boost: " + boost + ", ";
-	//contentBuffer += "dodgeForward: " + dodgeForward + ", ";
-	//contentBuffer += "dodgeStrafe: " + dodgeStrafe + ", ";
-	//contentBuffer += "handBrake: " + handBrake + ", ";
-	//contentBuffer += "roll: " + roll + ", ";
-	//contentBuffer += "directionalAirRoll: " + airRoll + ", ";
-	//contentBuffer += "pitch: " + analogueVertical + ", ";
-	//contentBuffer += "steer: " + analogueHorizontal + ", ";
-	//contentBuffer += "yaw: " + yaw + ", ";
-
-
 
 	//string newCommandsLog = "time (" + time + "), ";
 	string newCommandsLog = "";
@@ -164,12 +128,10 @@ void InputLogger::registerMove()
 	if (isDirectionalAirRoll) { newCommandsLog += "DirectionalAirRoll, "; }
 	if (isJump) { newCommandsLog += "Jump, "; }
 
-
-	if (lastCommandsLog == newCommandsLog) { return; }
+	if (lastCommandsLog == newCommandsLog || newCommandsLog == "") { return; }
 
 	lastCommandsLog = newCommandsLog;
 
-	//LOG("[InputLogger] contentBuffer == {0}", contentBuffer);
 	LOG("[InputLogger] lastInputs == {0}", newCommandsLog);
 }
 
@@ -177,7 +139,6 @@ string InputLogger::doubleToString(double value, int precision)
 {
 	// Create a stringstream object
 	ostringstream oss;
-
 	// Set the desired precision and fixed format
 	oss << std::fixed << std::setprecision(precision) << value;
 	return oss.str();
@@ -213,20 +174,12 @@ bool InputLogger::shouldSaveCurrentMove(ControllerInput currentInputs, bool dire
 
 void InputLogger::RenderCanvas(CanvasWrapper canvas)
 {
-	if (!IsEverythingOk()) return;
-
-	//string cpsText = contentBuffer;
-	//string lastCPSText = "last CPS: " + to_string(lastCPS) + ". LastTimeDifferences : " + lastTimeDifferences;
-	//string lastGhostJumpsText = "Last Ghost Jumps: " + lastGhostJumps;
+	//if (!IsEverythingOk()) return;
 
 	// THIS VALUES SHOULD BE VARIABLES BUT HAVING SO FEW, I JUST ADDED THEM FIXED
-	canvas.SetColor(0, 255, 0, 255);
-	canvas.SetPosition(Vector2{ 7, 200 });
-	canvas.DrawString(lastCommandsLog, 1.5f, 1.5f);
-	//canvas.SetPosition(Vector2{ 7, 200 + 31 });
-	//canvas.DrawString(lastCPSText, 1.5f, 1.5f);
-	//canvas.SetPosition(Vector2{ 7, 231 + 31 });
-	//canvas.DrawString(lastGhostJumpsText, 1.5f, 1.5f);
+	//canvas.SetColor(0, 255, 0, 255);
+	//canvas.SetPosition(Vector2{ 7, 200 });
+	//canvas.DrawString(lastCommandsLog, 1.5f, 1.5f);
 }
 
 void InputLogger::RenderSettings() {
@@ -238,63 +191,3 @@ void InputLogger::RenderSettings() {
 		cvarManager->executeCommand("writeconfig", false);
 	}
 }
-
-//void InputLogger::onUnload()
-//{
-//	writeConfigFile();
-//}
-
-//filesystem::path InputLogger::getConfigFilePath()
-//{
-//	return gameWrapper->GetBakkesModPath() / configFilePath;
-//}
-//
-//void InputLogger::writeConfigFile()
-//{
-//	ofstream configurationFile;
-//
-//	configurationFile.open(getConfigFilePath());
-//
-//	configurationFile << "toggleInputLogsKey \"" + toggleInputLogsKey + "\"";
-//	configurationFile << "\n";
-//
-//	configurationFile.close();
-//}
-
-//void InputLogger::toggleInputLogging()
-//{
-//	const chrono::duration<double> diff = system_clock::now() - lastToggle;
-//
-//	// Don't overreact if user stays on the save key, wait 500ms before toggling
-//	if (diff < duration_cast<system_clock::duration>(duration<double>(0.5))) { return; };
-//	lastToggle = chrono::system_clock::now();
-//
-//	if (saving) {
-//		LOG("Stopping input logging.");
-//
-//		// Prepare the files path, open it and save the content in it
-//		const auto time = system_clock::now().time_since_epoch();
-//		const string extension = ".csv";
-//		const string filename = to_string(time.count()) + extension;
-//		const auto path = gameWrapper->GetDataFolder() / "inputLogs" / filename;
-//		LOG("Path: " + path.string());
-//
-//		ofstream stream(path, ios::out);
-//		stream << contentBuffer.value();
-//
-//		// And reset the properties for a next call
-//		saving = false;
-//		contentBuffer.reset();
-//	}
-//	else {
-//		LOG("Starting input logging.");
-//
-//		startingPoint = system_clock::now();
-//
-//		// Put a 1st line of heading
-//		contentBuffer = "time,throttle,jump,boost,dodgeForward,dodgeStrafe,handBrake,roll,directionalAirRoll\n";
-//
-//		// This property on `true` will tell to register each move for each tick
-//		saving = true;
-//	}
-//}
