@@ -25,7 +25,7 @@ void InputLogger::onLoad()
 void InputLogger::initVars()
 {
 	enabled = std::make_shared<bool>(true);
-	cvarManager->registerCvar(CVAR_PLUGIN_ENABLED, "1", "Enable the plugin", true, true, 0, true, 1).bindTo(enabled);
+	cvarManager->registerCvar(CVAR_PLUGIN_ENABLED, "0", "Enable the plugin", true, true, 0, true, 1).bindTo(enabled);
 
 	lastCommandsLog = "";
 
